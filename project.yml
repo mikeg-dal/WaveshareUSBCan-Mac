@@ -1,0 +1,66 @@
+name: USBCANMac
+options:
+  bundleIdPrefix: dev.mikeg
+  deploymentTarget:
+    macOS: "26.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    ENABLE_HARDENED_RUNTIME: YES
+    CODE_SIGN_IDENTITY: "-"
+    CODE_SIGNING_REQUIRED: NO
+    DEAD_CODE_STRIPPING: YES
+    GCC_WARN_UNUSED_VARIABLE: YES
+    SWIFT_TREAT_WARNINGS_AS_ERRORS: NO
+    ARCHS: arm64
+    ONLY_ACTIVE_ARCH: YES
+
+targets:
+  USBCANMac:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sources
+        excludes:
+          - "Info.plist"
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.mikeg.usbcanmac
+        PRODUCT_NAME: USBCAN
+        INFOPLIST_FILE: Sources/Info.plist
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        COMBINE_HIDPI_IMAGES: YES
+
+  USBCANMacTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: Tests
+    dependencies:
+      - target: USBCANMac
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.mikeg.usbcanmac.tests
+        # The app's PRODUCT_NAME is USBCAN, not the target name, so the host path
+        # has to be stated rather than inferred.
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/USBCAN.app/Contents/MacOS/USBCAN"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+        GENERATE_INFOPLIST_FILE: YES
+
+schemes:
+  USBCANMac:
+    build:
+      targets:
+        USBCANMac: all
+        USBCANMacTests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - USBCANMacTests
